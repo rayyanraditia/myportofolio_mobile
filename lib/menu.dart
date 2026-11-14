@@ -23,18 +23,26 @@ class MyHomePage extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InfoCard(title: 'NPM', content: npm),
-                InfoCard(title: 'Name', content: nama),
-                InfoCard(title: 'Class', content: kelas),
-              ],
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: InfoCard(title: 'NPM', content: npm),
+                  ),
+                  Expanded(
+                    child: InfoCard(title: 'Name', content: nama),
+                  ),
+                  Expanded(
+                    child: InfoCard(title: 'Class', content: kelas),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16.0),
             Center(
@@ -51,7 +59,8 @@ class MyHomePage extends StatelessWidget {
                     ),
                   ),
                   GridView.count(
-                    primary: true,
+                    primary: false,
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(20),
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
@@ -81,14 +90,13 @@ class InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2.0,
-      child: Container(
-        width: MediaQuery.of(context).size.width / 3.5,
-        padding: const EdgeInsets.all(16.0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
         child: Column(
           children: [
             Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8.0),
-            Text(content),
+            Text(content, textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -126,19 +134,27 @@ class ItemCard extends StatelessWidget {
         },
         child: Container(
           padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(item.icon, color: Colors.white, size: 30.0),
-                const Padding(padding: EdgeInsets.all(3)),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return FittedBox(
+                fit: BoxFit.scaleDown,
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(item.icon, color: Colors.white, size: 30.0),
+                      const Padding(padding: EdgeInsets.all(3)),
+                      Text(
+                        item.name,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),

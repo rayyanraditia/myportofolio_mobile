@@ -16,6 +16,7 @@ Aplikasi mobile portofolio pribadi berbasis **Flutter**, bagian dari Proyek Indi
   - **Tambah Proyek** (hijau)
   - **Logout** (merah)
 - Setiap tombol menampilkan `SnackBar` bertuliskan "Kamu telah menekan tombol [Nama Tombol]!".
+- Tata letak responsif: kartu informasi dan tombol menyesuaikan lebar layar tanpa *overflow*, dan halaman dapat di-scroll pada mode landscape.
 
 ## Struktur Proyek
 
@@ -24,7 +25,8 @@ lib/
 ├── main.dart   # Titik masuk aplikasi: MyApp dan MaterialApp beserta tema
 └── menu.dart   # Halaman utama: MyHomePage, InfoCard, ItemHomepage, ItemCard
 test/
-└── widget_test.dart
+├── widget_test.dart             # Test data profil dan SnackBar
+└── responsive_layout_test.dart  # Test regresi overflow di berbagai ukuran layar
 ```
 
 ## Cara Menjalankan
@@ -59,6 +61,7 @@ test/
 |---|---|---|
 | 8 | Tutorial 08 | Setup Flutter, memisahkan `menu.dart` dari `main.dart`, `MyHomePage` sebagai `StatelessWidget`, serta membuat `InfoCard` dan `ItemCard` |
 | 8 | Tugas 7 | Data profil sendiri, warna latar unik per tombol melalui atribut `color` pada `ItemHomepage`, README, dan jawaban reflektif |
+| 8 | Tugas 7 (perbaikan) | Memperbaiki *overflow* layout di layar ponsel (`Expanded`, `FittedBox`, `SingleChildScrollView`) dan menambahkan test regresi layout |
 
 ## Pertanyaan Reflektif
 
@@ -78,12 +81,12 @@ test/
        └── MyHomePage
            └── Scaffold
                ├── AppBar → Text
-               └── Padding → Column
-                   ├── Row → InfoCard ×3 → Card → Container → Column → Text
+               └── SingleChildScrollView → Column
+                   ├── IntrinsicHeight → Row → Expanded ×3 → InfoCard → Card → Padding → Column → Text
                    ├── SizedBox
                    └── Center → Column
                        ├── Padding → Text
-                       └── GridView → ItemCard ×3 → Material → InkWell → Container → Center → Column → Icon, Padding, Text
+                       └── GridView → ItemCard ×3 → Material → InkWell → Container → LayoutBuilder → FittedBox → SizedBox → Column → Icon, Padding, Text
    ```
 
 2. **Widget yang digunakan dan fungsinya**
@@ -106,13 +109,17 @@ test/
    - `Center`: memposisikan child di tengah.
    - `GridView` (lewat `GridView.count`): menyusun `ItemCard` dalam grid tiga kolom.
    - `Card`: kontainer bergaya Material dengan sudut membulat dan bayangan (elevation), dipakai pada `InfoCard`.
-   - `Container`: kotak serbaguna untuk mengatur ukuran (lebar) dan padding.
+   - `Container`: kotak serbaguna, dipakai untuk memberi padding di dalam `ItemCard`.
+   - `SingleChildScrollView`: membuat isi halaman dapat di-scroll agar tidak *overflow* pada layar pendek (misalnya mode landscape).
+   - `IntrinsicHeight`: menyamakan tinggi ketiga `InfoCard` mengikuti kartu yang paling tinggi.
+   - `Expanded`: membagi lebar `Row` secara rata ke ketiga `InfoCard` sehingga selalu muat di layar.
+   - `LayoutBuilder`: memberikan ukuran (*constraints*) dari parent kepada `ItemCard` untuk menentukan lebar konten.
+   - `FittedBox`: mengecilkan isi `ItemCard` secara proporsional hanya jika tidak muat di dalam kotaknya.
    - `Material`: memberi warna latar dan bentuk (border radius) pada `ItemCard`, sekaligus menjadi permukaan untuk efek *ripple*.
    - `InkWell`: membuat area dapat ditekan (`onTap`) dengan efek ripple.
    - `Icon`: menampilkan ikon Material.
    - `SnackBar`: pesan singkat di bagian bawah layar saat tombol ditekan.
    - `ScaffoldMessenger`: mengelola tampilan SnackBar. Diakses lewat `ScaffoldMessenger.of(context)` untuk menyembunyikan SnackBar lama dan menampilkan yang baru.
-   - `MediaQuery`: menyediakan informasi layar. Diakses lewat `MediaQuery.of(context).size.width` untuk menghitung lebar `InfoCard`.
    - `Theme`: menyediakan tema. Diakses lewat `Theme.of(context).colorScheme.primary` untuk warna AppBar.
 
 3. **Fungsi MaterialApp dan alasan dipakai sebagai root widget**
@@ -136,7 +143,7 @@ test/
 
    Penggunaannya di proyek ini:
    - `Theme.of(context).colorScheme.primary` untuk warna latar `AppBar` di `MyHomePage`.
-   - `MediaQuery.of(context).size.width / 3.5` untuk lebar `InfoCard`.
+   - `LayoutBuilder` di `ItemCard` memanggil `builder(context, constraints)` sehingga konten bisa menyesuaikan ukuran kotak yang diberikan parent.
    - `ScaffoldMessenger.of(context)` di `ItemCard` untuk menampilkan SnackBar.
 
    Karena pencarian dimulai dari posisi context ke atas, context yang dipakai harus berada **di bawah** widget yang dicari. Misalnya, `ScaffoldMessenger.of(context)` hanya berhasil kalau context berada di bawah `MaterialApp`.
@@ -187,6 +194,7 @@ Setiap tahap mengikuti pola yang sama. Saya menetapkan tujuan dan batasan, AI me
 | 4. Implementasi warna tombol | Warna latar unik per `ItemCard` tanpa logika pewarnaan berulang | Setiap langkah wajib memiliki hasil yang diharapkan yang bisa diperiksa | Mengimplementasikan atribut `color` pada `ItemHomepage` dalam 2 commit bertahap di branch `feat/item-card-colors` | `flutter analyze`, `flutter test`, dan pengecekan visual aplikasi (biru, hijau, merah, serta SnackBar) |
 | 5. Integrasi ke `main` | Menggabungkan fitur melalui Pull Request | Status di GitHub diverifikasi langsung, bukan diasumsikan | Membuat dan me-merge PR #1 setelah pengecekan menunjukkan PR belum terbentuk | Grafik `git log --graph` menunjukkan merge commit, dan PR #1 berstatus *Merged* |
 | 6. Dokumentasi | README, jawaban reflektif, dan AI disclosure | Draf jawaban harus merujuk ke kode proyek ini, bukan penjelasan generik | Meninjau dan menyesuaikan draf, membagi perubahan ke beberapa commit di branch `docs/readme-tugas-7`, serta merapikan *trailing whitespace* | Preview Markdown dan `git diff --check` |
+| 7. Pengujian responsif | Memastikan aplikasi tidak rusak di layar ponsel sungguhan | Aplikasi diuji pada beberapa ukuran layar, bukan hanya di jendela desktop | Mengimplementasikan perbaikan *overflow* di branch `fix/responsive-layout` dan menambahkan test regresi | `flutter test` pada ukuran 320×480, 360×640, dan 800×360, serta pengecekan visual |
 
 **Analisis kritis keterbatasan AI dan perbaikan manual**
 - **AI melewatkan syarat rubrik.** Rencana awal dari AI menyuruh commit langsung ke `main`, padahal rubrik Git & Disiplin menilai *branching* per fitur. Saya menemukan celah ini dan meminta rencana disusun ulang. Pelajaran: output AI harus dicek ulang terhadap rubrik, bukan langsung dipercaya.
