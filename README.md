@@ -154,4 +154,36 @@ test/
    **Full restart** (hentikan aplikasi dengan `q`, lalu `flutter run` lagi) diperlukan ketika ada perubahan pada:
    - Kode native (Android/Kotlin, iOS/Swift) atau konfigurasi platform.
    - Dependensi di `pubspec.yaml` yang memiliki kode native (plugin), atau penambahan aset baru.
-   
+
+## AI Disclosure
+
+### Tugas 7
+
+**Tools yang digunakan**
+- **Claude Code** (model Claude Opus 5.5) di aplikasi desktop Claude.
+
+**Strategi prompting**
+- **AI sebagai pemandu, bukan pengeksekusi.** Saya meminta AI tidak mengubah file apa pun kecuali diminta secara eksplisit. AI hanya menjelaskan perubahan dan langkah-langkahnya di chat, lalu saya sendiri yang mengetik kode, menjalankan perintah, membuat commit, dan membuat Pull Request.
+- **Berbasis rubrik.** Di awal, AI diminta membaca halaman soal dan rubrik penilaian serta memeriksa isi proyek, lalu memetakan checklist mana yang sudah dan belum terpenuhi.
+- **Bertahap.** Pekerjaan dipecah per langkah: (1) warna tombol, (2) README dan jawaban reflektif, (3) AI disclosure. Saya baru lanjut ke langkah berikutnya setelah langkah sebelumnya diverifikasi.
+- **Meminta verifikasi, bukan sekadar jawaban.** Setelah setiap langkah, saya meminta AI memeriksa hasil kerja saya: status git, isi commit, `flutter analyze`, `flutter test`, status Pull Request di GitHub, dan tampilan aplikasi yang dijalankan versi web-nya.
+
+**Bagian yang dibantu AI**
+- Menganalisis checklist dan rubrik Tugas 7 terhadap kondisi proyek.
+- Instruksi perubahan kode untuk warna latar per tombol: atribut `color` pada `ItemHomepage` dan `item.color` pada `ItemCard`. Kodenya saya ketik sendiri.
+- Alur Git: branch per fitur, pesan *conventional commits*, serta Pull Request dengan *merge commit*.
+- Draf README: deskripsi, cara menjalankan, progres mingguan, dan draf jawaban pertanyaan reflektif yang kemudian saya baca dan pahami.
+- Verifikasi hasil: pengecekan git, analisis statis, test, dan tangkapan layar aplikasi.
+
+**Log interaksi AI**
+
+Setiap tahap mengikuti pola yang sama. Saya menetapkan tujuan dan batasan, AI memberi analisis atau instruksi, saya mengimplementasikan sendiri, lalu hasilnya divalidasi sebelum lanjut ke tahap berikutnya.
+
+| Tahap | Tujuan | Batasan / instruksi yang saya tetapkan | Keputusan dan tindakan saya | Validasi |
+|---|---|---|---|---|
+| 1. Analisis kebutuhan | Memetakan checklist dan rubrik Tugas 7 terhadap kondisi repositori | AI hanya boleh membaca (*read-only*) halaman soal dan isi proyek, tanpa mengubah file | Menetapkan urutan pengerjaan berdasarkan bagian yang belum terpenuhi: warna tombol, README, AI disclosure, riwayat commit | Tabel status checklist dan hasil `flutter analyze` awal (*No issues found*) |
+| 2. Penetapan alur kerja | Menjaga agar implementasi tetap dikerjakan sendiri | AI berperan sebagai *reviewer* dan pemandu: perubahan dijelaskan per langkah di chat, tidak ditulis langsung ke file | Semua kode, commit, dan Pull Request saya kerjakan sendiri | — |
+| 3. Review terhadap rubrik | Memastikan rencana Git memenuhi kriteria nilai tertinggi | Meminta AI meninjau ulang rubrik Git & Disiplin | Menemukan bahwa rencana awal (commit langsung ke `main`) belum memenuhi syarat *branching* per fitur, lalu meminta rencana disusun ulang dari awal | Rencana baru memakai branch fitur, *conventional commits*, dan Pull Request dengan *merge commit* |
+| 4. Implementasi warna tombol | Warna latar unik per `ItemCard` tanpa logika pewarnaan berulang | Setiap langkah wajib memiliki hasil yang diharapkan yang bisa diperiksa | Mengimplementasikan atribut `color` pada `ItemHomepage` dalam 2 commit bertahap di branch `feat/item-card-colors` | `flutter analyze`, `flutter test`, dan pengecekan visual aplikasi (biru, hijau, merah, serta SnackBar) |
+| 5. Integrasi ke `main` | Menggabungkan fitur melalui Pull Request | Status di GitHub diverifikasi langsung, bukan diasumsikan | Membuat dan me-merge PR #1 setelah pengecekan menunjukkan PR belum terbentuk | Grafik `git log --graph` menunjukkan merge commit, dan PR #1 berstatus *Merged* |
+| 6. Dokumentasi | README, jawaban reflektif, dan AI disclosure | Draf jawaban harus merujuk ke kode proyek ini, bukan penjelasan generik | Meninjau dan menyesuaikan draf, membagi perubahan ke beberapa commit di branch `docs/readme-tugas-7`, serta merapikan *trailing whitespace* | Preview Markdown dan `git diff --check` |
