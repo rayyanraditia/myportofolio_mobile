@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatelessWidget {
-  MyHomePage({super.key});
+  const MyHomePage({super.key});
 
   final String npm = "2506598955";
   final String nama = "Rayyan Raditia Pramana";
   final String kelas = "PBP F";
 
-  final List<ItemHomepage> items = [
+  final List<ItemHomepage> items = const [
     ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
     ItemHomepage("Tambah Proyek", Icons.add_circle, Colors.green),
     ItemHomepage("Logout", Icons.logout, Colors.red),
@@ -109,7 +109,7 @@ class ItemHomepage {
   final IconData icon;
   final Color color;
 
-  ItemHomepage(this.name, this.icon, this.color);
+  const ItemHomepage(this.name, this.icon, this.color);
 }
 
 class ItemCard extends StatelessWidget {
