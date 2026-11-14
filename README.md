@@ -62,6 +62,7 @@ test/
 | 8 | Tutorial 08 | Setup Flutter, memisahkan `menu.dart` dari `main.dart`, `MyHomePage` sebagai `StatelessWidget`, serta membuat `InfoCard` dan `ItemCard` |
 | 8 | Tugas 7 | Data profil sendiri, warna latar unik per tombol melalui atribut `color` pada `ItemHomepage`, README, dan jawaban reflektif |
 | 8 | Tugas 7 (perbaikan) | Memperbaiki *overflow* layout di layar ponsel (`Expanded`, `FittedBox`, `SingleChildScrollView`) dan menambahkan test regresi layout |
+| 8 | Tugas 7 (kualitas kode) | Konstruktor `const` pada `MyHomePage` dan `ItemHomepage`, docstring pada seluruh class dan field, serta komentar yang menjelaskan keputusan layout |
 
 ## Pertanyaan Reflektif
 
@@ -195,6 +196,7 @@ Setiap tahap mengikuti pola yang sama. Saya menetapkan tujuan dan batasan, AI me
 | 5. Integrasi ke `main` | Menggabungkan fitur melalui Pull Request | Status di GitHub diverifikasi langsung, bukan diasumsikan | Membuat dan me-merge PR #1 setelah pengecekan menunjukkan PR belum terbentuk | Grafik `git log --graph` menunjukkan merge commit, dan PR #1 berstatus *Merged* |
 | 6. Dokumentasi | README, jawaban reflektif, dan AI disclosure | Draf jawaban harus merujuk ke kode proyek ini, bukan penjelasan generik | Meninjau dan menyesuaikan draf, membagi perubahan ke beberapa commit di branch `docs/readme-tugas-7`, serta merapikan *trailing whitespace* | Preview Markdown dan `git diff --check` |
 | 7. Pengujian responsif | Memastikan aplikasi tidak rusak di layar ponsel sungguhan | Aplikasi diuji pada beberapa ukuran layar, bukan hanya di jendela desktop | Mengimplementasikan perbaikan *overflow* di branch `fix/responsive-layout` dan menambahkan test regresi | `flutter test` pada ukuran 320×480, 360×640, dan 800×360, serta pengecekan visual |
+| 8. Kualitas kode | Kode mudah dipahami dan efisien | Perubahan kualitas kode tidak boleh mengubah perilaku aplikasi | Menambahkan konstruktor `const`, docstring, dan komentar di branch `refactor/code-quality`, lalu merapikan format dengan `dart format` | `flutter analyze`, `flutter test`, dan `dart format --set-exit-if-changed` |
 
 **Analisis kritis keterbatasan AI dan perbaikan manual**
 - **AI melewatkan syarat rubrik.** Rencana awal dari AI menyuruh commit langsung ke `main`, padahal rubrik Git & Disiplin menilai *branching* per fitur. Saya menemukan celah ini dan meminta rencana disusun ulang. Pelajaran: output AI harus dicek ulang terhadap rubrik, bukan langsung dipercaya.

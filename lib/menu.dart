@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
 
+/// Halaman utama aplikasi MyPortfolio Mobile.
+///
+/// Menampilkan identitas pemilik portofolio dalam tiga [InfoCard] dan
+/// tombol-tombol aksi dalam bentuk [ItemCard]. Widget ini bersifat
+/// [StatelessWidget] karena seluruh datanya tetap (konstan) dan tidak
+/// berubah selama aplikasi berjalan.
 class MyHomePage extends StatelessWidget {
-  MyHomePage({super.key});
+  const MyHomePage({super.key});
 
+  /// Nomor Pokok Mahasiswa pemilik portofolio.
   final String npm = "2506598955";
+
+  /// Nama lengkap pemilik portofolio.
   final String nama = "Rayyan Raditia Pramana";
+
+  /// Kelas mata kuliah PBP pemilik portofolio.
   final String kelas = "PBP F";
 
-  final List<ItemHomepage> items = [
+  /// Daftar tombol aksi yang ditampilkan di halaman utama.
+  ///
+  /// Setiap tombol membawa warnanya sendiri melalui [ItemHomepage.color],
+  /// sehingga [ItemCard] tidak memerlukan percabangan untuk menentukan warna.
+  /// Daftar dibuat `const` agar hanya dialokasikan sekali saat kompilasi.
+  final List<ItemHomepage> items = const [
     ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
     ItemHomepage("Tambah Proyek", Icons.add_circle, Colors.green),
     ItemHomepage("Logout", Icons.logout, Colors.red),
@@ -23,11 +39,16 @@ class MyHomePage extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
+      // SingleChildScrollView mencegah overflow ketika tinggi layar tidak
+      // cukup, misalnya saat ponsel dalam mode landscape.
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // IntrinsicHeight + stretch menyamakan tinggi ketiga kartu,
+            // sedangkan Expanded membagi lebar Row secara rata sehingga
+            // kartu selalu muat di layar sempit.
             IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -59,6 +80,9 @@ class MyHomePage extends StatelessWidget {
                     ),
                   ),
                   GridView.count(
+                    // Scroll ditangani oleh SingleChildScrollView di atas.
+                    // GridView tidak boleh memakai PrimaryScrollController
+                    // yang sama dan tidak perlu scroll sendiri.
                     primary: false,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(20),
@@ -80,8 +104,13 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+/// Kartu informasi yang menampilkan satu pasang judul dan isi,
+/// misalnya `NPM` dan nomor NPM pemilik portofolio.
 class InfoCard extends StatelessWidget {
+  /// Label informasi yang ditampilkan dengan huruf tebal, misalnya `Name`.
   final String title;
+
+  /// Nilai informasi yang ditampilkan di bawah [title].
   final String content;
 
   const InfoCard({super.key, required this.title, required this.content});
@@ -91,6 +120,8 @@ class InfoCard extends StatelessWidget {
     return Card(
       elevation: 2.0,
       child: Padding(
+        // Padding horizontal dibuat lebih kecil agar teks panjang seperti
+        // NPM tetap muat dalam satu baris di layar ponsel.
         padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
         child: Column(
           children: [
@@ -104,15 +135,28 @@ class InfoCard extends StatelessWidget {
   }
 }
 
+/// Model data untuk satu tombol aksi di halaman utama.
+///
+/// Kelas ini bukan widget; datanya digunakan oleh [ItemCard] untuk
+/// menampilkan nama, ikon, dan warna latar tombol.
 class ItemHomepage {
+  /// Teks yang ditampilkan pada tombol dan pada pesan SnackBar.
   final String name;
+
+  /// Ikon Material yang ditampilkan di atas [name].
   final IconData icon;
+
+  /// Warna latar tombol; setiap tombol memiliki warna yang berbeda.
   final Color color;
 
-  ItemHomepage(this.name, this.icon, this.color);
+  const ItemHomepage(this.name, this.icon, this.color);
 }
 
+/// Tombol aksi berbentuk kartu berwarna yang dibangun dari [ItemHomepage].
+///
+/// Saat ditekan, kartu menampilkan [SnackBar] berisi nama tombol tersebut.
 class ItemCard extends StatelessWidget {
+  /// Data tombol (nama, ikon, dan warna) yang ditampilkan kartu ini.
   final ItemHomepage item;
 
   const ItemCard(this.item, {super.key});
@@ -124,6 +168,8 @@ class ItemCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: () {
+          // SnackBar sebelumnya disembunyikan terlebih dahulu agar pesan
+          // yang muncul selalu sesuai dengan tombol yang terakhir ditekan.
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
@@ -134,6 +180,10 @@ class ItemCard extends StatelessWidget {
         },
         child: Container(
           padding: const EdgeInsets.all(8),
+          // LayoutBuilder memberi lebar kotak kepada konten agar teks tetap
+          // dapat terbungkus (wrap). FittedBox dengan BoxFit.scaleDown hanya
+          // mengecilkan konten jika tidak muat, sehingga tidak terjadi
+          // overflow di layar kecil tanpa mengubah tampilan di layar besar.
           child: LayoutBuilder(
             builder: (context, constraints) {
               return FittedBox(
