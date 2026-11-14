@@ -15,7 +15,7 @@ Aplikasi mobile portofolio pribadi berbasis **Flutter**, bagian dari Proyek Indi
   - **Lihat Proyek** (biru)
   - **Tambah Proyek** (hijau)
   - **Logout** (merah)
-- Setiap tombol menampilkan `SnackBar` bertuliskan "Kamu telah menekan tombol [Nama Tombol]!".
+- Setiap tombol menampilkan `SnackBar` mengambang bertuliskan "Kamu telah menekan tombol [Nama Tombol]!", lengkap dengan ikon dan warna latar yang sama seperti tombol yang ditekan.
 - Tata letak responsif: kartu informasi dan tombol menyesuaikan lebar layar tanpa *overflow*, dan halaman dapat di-scroll pada mode landscape.
 
 ## Struktur Proyek
@@ -26,7 +26,8 @@ lib/
 └── menu.dart   # Halaman utama: MyHomePage, InfoCard, ItemHomepage, ItemCard
 test/
 ├── widget_test.dart             # Test data profil dan SnackBar
-└── responsive_layout_test.dart  # Test regresi overflow di berbagai ukuran layar
+├── responsive_layout_test.dart  # Test regresi overflow di berbagai ukuran layar
+└── snackbar_feedback_test.dart  # Test ikon, warna, dan gaya SnackBar per tombol
 ```
 
 ## Cara Menjalankan
@@ -63,6 +64,7 @@ test/
 | 8 | Tugas 7 | Data profil sendiri, warna latar unik per tombol melalui atribut `color` pada `ItemHomepage`, README, dan jawaban reflektif |
 | 8 | Tugas 7 (perbaikan) | Memperbaiki *overflow* layout di layar ponsel (`Expanded`, `FittedBox`, `SingleChildScrollView`) dan menambahkan test regresi layout |
 | 8 | Tugas 7 (kualitas kode) | Konstruktor `const` pada `MyHomePage` dan `ItemHomepage`, docstring pada seluruh class dan field, serta komentar yang menjelaskan keputusan layout |
+| 8 | Tugas 7 (fitur tambahan) | `SnackBar` mengambang dengan ikon dan warna latar sesuai tombol yang ditekan, beserta test-nya |
 
 ## Pertanyaan Reflektif
 
@@ -113,13 +115,13 @@ test/
    - `Container`: kotak serbaguna, dipakai untuk memberi padding di dalam `ItemCard`.
    - `SingleChildScrollView`: membuat isi halaman dapat di-scroll agar tidak *overflow* pada layar pendek (misalnya mode landscape).
    - `IntrinsicHeight`: menyamakan tinggi ketiga `InfoCard` mengikuti kartu yang paling tinggi.
-   - `Expanded`: membagi lebar `Row` secara rata ke ketiga `InfoCard` sehingga selalu muat di layar.
+   - `Expanded`: membagi ruang di dalam `Row`. Dipakai untuk membagi lebar secara rata ke ketiga `InfoCard`, dan untuk memberi sisa lebar SnackBar kepada teks pesan agar dapat terbungkus.
    - `LayoutBuilder`: memberikan ukuran (*constraints*) dari parent kepada `ItemCard` untuk menentukan lebar konten.
    - `FittedBox`: mengecilkan isi `ItemCard` secara proporsional hanya jika tidak muat di dalam kotaknya.
    - `Material`: memberi warna latar dan bentuk (border radius) pada `ItemCard`, sekaligus menjadi permukaan untuk efek *ripple*.
    - `InkWell`: membuat area dapat ditekan (`onTap`) dengan efek ripple.
    - `Icon`: menampilkan ikon Material.
-   - `SnackBar`: pesan singkat di bagian bawah layar saat tombol ditekan.
+   - `SnackBar`: pesan singkat di bagian bawah layar saat tombol ditekan. Dibuat mengambang (`SnackBarBehavior.floating`) dengan ikon dan warna latar yang sama seperti tombolnya.
    - `ScaffoldMessenger`: mengelola tampilan SnackBar. Diakses lewat `ScaffoldMessenger.of(context)` untuk menyembunyikan SnackBar lama dan menampilkan yang baru.
    - `Theme`: menyediakan tema. Diakses lewat `Theme.of(context).colorScheme.primary` untuk warna AppBar.
 
@@ -197,6 +199,7 @@ Setiap tahap mengikuti pola yang sama. Saya menetapkan tujuan dan batasan, AI me
 | 6. Dokumentasi | README, jawaban reflektif, dan AI disclosure | Draf jawaban harus merujuk ke kode proyek ini, bukan penjelasan generik | Meninjau dan menyesuaikan draf, membagi perubahan ke beberapa commit di branch `docs/readme-tugas-7`, serta merapikan *trailing whitespace* | Preview Markdown dan `git diff --check` |
 | 7. Pengujian responsif | Memastikan aplikasi tidak rusak di layar ponsel sungguhan | Aplikasi diuji pada beberapa ukuran layar, bukan hanya di jendela desktop | Mengimplementasikan perbaikan *overflow* di branch `fix/responsive-layout` dan menambahkan test regresi | `flutter test` pada ukuran 320×480, 360×640, dan 800×360, serta pengecekan visual |
 | 8. Kualitas kode | Kode mudah dipahami dan efisien | Perubahan kualitas kode tidak boleh mengubah perilaku aplikasi | Menambahkan konstruktor `const`, docstring, dan komentar di branch `refactor/code-quality`, lalu merapikan format dengan `dart format` | `flutter analyze`, `flutter test`, dan `dart format --set-exit-if-changed` |
+| 9. Fitur tambahan | Umpan balik yang lebih jelas saat tombol ditekan | Fitur tambahan harus kecil, relevan, dan tidak mengubah pesan SnackBar yang diwajibkan soal | Mengimplementasikan SnackBar mengambang dengan ikon dan warna tombol di branch `feat/snackbar-feedback` | Test baru yang gagal sebelum fitur dan lolos sesudahnya, ditambah pengecekan visual di ukuran ponsel |
 
 **Analisis kritis keterbatasan AI dan perbaikan manual**
 - **AI melewatkan syarat rubrik.** Rencana awal dari AI menyuruh commit langsung ke `main`, padahal rubrik Git & Disiplin menilai *branching* per fitur. Saya menemukan celah ini dan meminta rencana disusun ulang. Pelajaran: output AI harus dicek ulang terhadap rubrik, bukan langsung dipercaya.
@@ -204,3 +207,4 @@ Setiap tahap mengikuti pola yang sama. Saya menetapkan tujuan dan batasan, AI me
 - **Kendala teknis pada alat AI.** Pengambilan halaman soal sempat gagal karena *rate limit* (HTTP 429), dan `flutter analyze` yang dijalankan AI sempat macet karena `flutter run` saya masih memegang lock Flutter. AI perlu cara alternatif, yaitu membuka halaman lewat browser dan memakai `dart analyze`.
 - **Draf jawaban reflektif tetap harus dipahami sendiri.** Jawaban dari AI saya tinjau dan cocokkan dengan kode saya, misalnya penggunaan `BuildContext` di `menu.dart`, supaya saya bisa menjelaskannya sendiri saat demo.
 - **Kerapian detail.** README sempat menyisakan *trailing whitespace* (terdeteksi oleh `git diff --check`) dan bagian analisis ini sempat terhapus saat tabel log diganti. Keduanya saya temukan saat review akhir dan saya perbaiki secara manual.
+- **Instruksi AI tidak selalu lengkap.** Pada tahap kualitas kode, AI memperkirakan `dart format` hanya mengubah file test, padahal file `lib` yang saya tempel juga ikut berubah (newline di akhir file). Akibatnya perubahan kecil itu masuk ke commit dokumentasi, bukan ke commit format. Pelajaran: selalu periksa `git status` sebelum dan sesudah commit.

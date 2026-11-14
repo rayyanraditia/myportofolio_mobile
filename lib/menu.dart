@@ -154,7 +154,8 @@ class ItemHomepage {
 
 /// Tombol aksi berbentuk kartu berwarna yang dibangun dari [ItemHomepage].
 ///
-/// Saat ditekan, kartu menampilkan [SnackBar] berisi nama tombol tersebut.
+/// Saat ditekan, kartu menampilkan [SnackBar] mengambang berisi ikon dan
+/// nama tombol tersebut, dengan warna latar yang sama seperti tombolnya.
 class ItemCard extends StatelessWidget {
   /// Data tombol (nama, ikon, dan warna) yang ditampilkan kartu ini.
   final ItemHomepage item;
@@ -173,8 +174,25 @@ class ItemCard extends StatelessWidget {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
+              // SnackBar mengambang memakai ikon dan warna yang sama dengan
+              // tombol, sehingga pengguna langsung tahu tombol mana yang
+              // baru saja ditekan.
               SnackBar(
-                content: Text("Kamu telah menekan tombol ${item.name}!"),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: item.color,
+                duration: const Duration(seconds: 2),
+                content: Row(
+                  children: [
+                    Icon(item.icon, color: Colors.white),
+                    const SizedBox(width: 12.0),
+                    Expanded(
+                      child: Text(
+                        "Kamu telah menekan tombol ${item.name}!",
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
         },
