@@ -17,17 +17,25 @@ Aplikasi mobile portofolio pribadi berbasis **Flutter**, bagian dari Proyek Indi
   - **Logout** (merah)
 - Setiap tombol menampilkan `SnackBar` mengambang bertuliskan "Kamu telah menekan tombol [Nama Tombol]!", lengkap dengan ikon dan warna latar yang sama seperti tombol yang ditekan.
 - Tata letak responsif: kartu informasi dan tombol menyesuaikan lebar layar tanpa *overflow*, dan halaman dapat di-scroll pada mode landscape.
+- Drawer navigasi (`LeftDrawer`) untuk berpindah antara halaman utama dan halaman tambah proyek.
+- Halaman form tambah proyek (`ProjectFormPage`) dengan validasi, dropdown kategori, dan pop-up yang menampilkan isian form. Tombol **Tambah Proyek** juga membuka halaman ini.
 
 ## Struktur Proyek
 
 ```
 lib/
-├── main.dart   # Titik masuk aplikasi: MyApp dan MaterialApp beserta tema
-└── menu.dart   # Halaman utama: MyHomePage, InfoCard, ItemHomepage, ItemCard
+├── main.dart                # Titik masuk aplikasi: MyApp dan MaterialApp beserta tema
+├── screens/
+│   ├── menu.dart            # Halaman utama: MyHomePage, InfoCard, ItemHomepage
+│   └── project_form.dart    # Halaman form tambah proyek: ProjectFormPage
+└── widgets/
+    ├── left_drawer.dart     # Drawer navigasi: LeftDrawer
+    └── project_card.dart    # Tombol aksi berbentuk kartu: ItemCard
 test/
-├── widget_test.dart             # Test data profil dan SnackBar
+├── widget_test.dart             # Test data profil, SnackBar, dan navigasi tombol
 ├── responsive_layout_test.dart  # Test regresi overflow di berbagai ukuran layar
-└── snackbar_feedback_test.dart  # Test ikon, warna, dan gaya SnackBar per tombol
+├── snackbar_feedback_test.dart  # Test ikon, warna, dan gaya SnackBar per tombol
+└── project_form_test.dart       # Test validasi form, pop-up, dan navigasi drawer
 ```
 
 ## Cara Menjalankan
@@ -65,6 +73,7 @@ test/
 | 8 | Tugas 7 (perbaikan) | Memperbaiki *overflow* layout di layar ponsel (`Expanded`, `FittedBox`, `SingleChildScrollView`) dan menambahkan test regresi layout |
 | 8 | Tugas 7 (kualitas kode) | Konstruktor `const` pada `MyHomePage` dan `ItemHomepage`, docstring pada seluruh class dan field, serta komentar yang menjelaskan keputusan layout |
 | 8 | Tugas 7 (fitur tambahan) | `SnackBar` mengambang dengan ikon dan warna latar sesuai tombol yang ditekan, beserta test-nya |
+| 9 | Tutorial 09 | Migrasi ke paket `material_ui`, drawer navigasi, halaman form tambah proyek dengan validasi dan pop-up, navigasi dari tombol **Tambah Proyek**, serta pemisahan berkas ke `screens/` dan `widgets/` |
 
 ## Pertanyaan Reflektif
 
