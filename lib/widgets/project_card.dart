@@ -1,12 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:myportofolio_mobile/screens/menu.dart';
-import 'package:myportofolio_mobile/screens/project_form.dart';
 
 /// Tombol aksi berbentuk kartu berwarna yang dibangun dari [ItemHomepage].
 ///
 /// Saat ditekan, kartu menampilkan [SnackBar] mengambang berisi ikon dan
 /// nama tombol tersebut, dengan warna latar yang sama seperti tombolnya.
-/// Tombol "Tambah Proyek" juga membuka [ProjectFormPage].
+/// Jika [ItemHomepage.page] diisi, kartu juga membuka halaman tersebut.
 class ItemCard extends StatelessWidget {
   /// Data tombol (nama, ikon, dan warna) yang ditampilkan kartu ini.
   final ItemHomepage item;
@@ -47,12 +46,13 @@ class ItemCard extends StatelessWidget {
               ),
             );
 
-          // Navigator.push menumpuk halaman form di atas halaman menu,
+          // Navigator.push menumpuk halaman tujuan di atas halaman menu,
           // sehingga pengguna dapat kembali dengan tombol Back.
-          if (item.name == "Tambah Proyek") {
+          final page = item.page;
+          if (page != null) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProjectFormPage()),
+              MaterialPageRoute(builder: (context) => page),
             );
           }
         },

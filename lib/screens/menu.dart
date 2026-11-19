@@ -1,4 +1,6 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:myportofolio_mobile/screens/education_form.dart';
+import 'package:myportofolio_mobile/screens/project_form.dart';
 import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 import 'package:myportofolio_mobile/widgets/project_card.dart';
 
@@ -22,12 +24,24 @@ class MyHomePage extends StatelessWidget {
 
   /// Daftar tombol aksi yang ditampilkan di halaman utama.
   ///
-  /// Setiap tombol membawa warnanya sendiri melalui [ItemHomepage.color],
-  /// sehingga [ItemCard] tidak memerlukan percabangan untuk menentukan warna.
-  /// Daftar dibuat `const` agar hanya dialokasikan sekali saat kompilasi.
+  /// Setiap tombol membawa warna dan halaman tujuannya sendiri melalui
+  /// [ItemHomepage.color] dan [ItemHomepage.page], sehingga [ItemCard] tidak
+  /// memerlukan percabangan berdasarkan nama tombol. Daftar dibuat `const`
+  /// agar hanya dialokasikan sekali saat kompilasi.
   final List<ItemHomepage> items = const [
     ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
-    ItemHomepage("Tambah Proyek", Icons.add_circle, Colors.green),
+    ItemHomepage(
+      "Tambah Proyek",
+      Icons.add_circle,
+      Colors.green,
+      page: ProjectFormPage(),
+    ),
+    ItemHomepage(
+      "Tambah Edukasi",
+      Icons.school,
+      Colors.purple,
+      page: EducationFormPage(),
+    ),
     ItemHomepage("Logout", Icons.logout, Colors.red),
   ];
 
@@ -84,7 +98,7 @@ class MyHomePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  GridView.count(
+                  GridView.extent(
                     // Scroll ditangani oleh SingleChildScrollView di atas.
                     // GridView tidak boleh memakai PrimaryScrollController
                     // yang sama dan tidak perlu scroll sendiri.
@@ -93,7 +107,10 @@ class MyHomePage extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
-                    crossAxisCount: 3,
+                    // Jumlah kolom menyesuaikan lebar layar: setiap kartu
+                    // maksimal 200 px, sehingga ponsel menampilkan 2 kolom
+                    // (2 x 2) dan layar lebar menampilkan 4 kolom (1 baris).
+                    maxCrossAxisExtent: 200,
                     shrinkWrap: true,
                     children: items.map((ItemHomepage item) {
                       return ItemCard(item);
@@ -154,5 +171,9 @@ class ItemHomepage {
   /// Warna latar tombol; setiap tombol memiliki warna yang berbeda.
   final Color color;
 
-  const ItemHomepage(this.name, this.icon, this.color);
+  /// Halaman yang dibuka saat tombol ditekan; `null` jika tombol hanya
+  /// menampilkan SnackBar.
+  final Widget? page;
+
+  const ItemHomepage(this.name, this.icon, this.color, {this.page});
 }
