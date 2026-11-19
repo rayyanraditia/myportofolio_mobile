@@ -11,31 +11,54 @@ Aplikasi mobile portofolio pribadi berbasis **Flutter**, bagian dari Proyek Indi
 ## Fitur Saat Ini
 
 - Tiga kartu informasi (`InfoCard`) berisi NPM, nama, dan kelas pemilik portofolio.
-- Tiga tombol aksi (`ItemCard`) dengan warna latar berbeda:
+- Empat tombol aksi (`ItemCard`) dengan warna latar berbeda. Jumlah kolomnya menyesuaikan lebar layar (2 kolom di ponsel, 4 kolom di layar lebar):
   - **Lihat Proyek** (biru)
-  - **Tambah Proyek** (hijau)
+  - **Tambah Proyek** (hijau), membuka form tambah proyek
+  - **Tambah Edukasi** (ungu), membuka form tambah edukasi
   - **Logout** (merah)
 - Setiap tombol menampilkan `SnackBar` mengambang bertuliskan "Kamu telah menekan tombol [Nama Tombol]!", lengkap dengan ikon dan warna latar yang sama seperti tombol yang ditekan.
 - Tata letak responsif: kartu informasi dan tombol menyesuaikan lebar layar tanpa *overflow*, dan halaman dapat di-scroll pada mode landscape.
-- Drawer navigasi (`LeftDrawer`) untuk berpindah antara halaman utama dan halaman tambah proyek.
-- Halaman form tambah proyek (`ProjectFormPage`) dengan validasi, dropdown kategori, dan pop-up yang menampilkan isian form. Tombol **Tambah Proyek** juga membuka halaman ini.
+- Drawer navigasi (`LeftDrawer`) dengan opsi **Home**, **Add Project**, dan **Add Education**. Drawer yang sama dipakai di halaman utama dan kedua halaman form.
+- Halaman form tambah proyek (`ProjectFormPage`) dengan validasi, dropdown kategori, dan pop-up yang menampilkan isian form.
+- Halaman form tambah edukasi (`EducationFormPage`) yang field-nya mengikuti model `Education` di proyek Django:
+
+  | Field di form | Field di Django | Input | Aturan validasi |
+  |---|---|---|---|
+  | Nama Institusi | `title` | `TextFormField` dengan penghitung karakter | Wajib, tidak boleh hanya spasi, maksimal 255 karakter |
+  | Deskripsi Pendidikan | `description` | `TextFormField` multi-baris | Wajib, tidak boleh hanya spasi |
+  | Jenjang Pendidikan | `category` | `DropdownButtonFormField` | Pilihan Junior High School, Senior High School, atau University (default University) |
+  | URL Logo Institusi | `thumbnail` | `TextFormField` dengan keyboard URL | Opsional; jika diisi harus URL `http`/`https` dengan domain lengkap, maksimal 200 karakter |
+  | Tanggal Mulai | `started_at` | `showDatePicker()` | Wajib dipilih |
+  | Masih berlangsung | `ended_at = null` (`is_ongoing`) | `SwitchListTile` | Jika aktif, tanggal selesai dikosongkan dan tidak wajib |
+  | Tanggal Selesai | `ended_at` | `showDatePicker()` | Wajib jika tidak sedang berlangsung, dan tidak boleh sebelum tanggal mulai |
+
+  Setelah semua input valid, tombol **Simpan** menampilkan seluruh isian dalam `AlertDialog`. Tombol **OK** menutup dialog dan mengosongkan form.
+
+  Catatan: di Django, `started_at` diisi otomatis (`auto_now_add`). Di aplikasi mobile, tanggal mulai dibuat sebagai input agar pengguna dapat mencatat kapan pendidikan dimulai, sesuai instruksi tugas tentang `showDatePicker()` dan urutan tanggal. Nilai jenjang disimpan sama persis dengan pilihan Django (termasuk ejaan `juniour high school`) agar nantinya kompatibel dengan REST API.
 
 ## Struktur Proyek
 
 ```
 lib/
-├── main.dart                # Titik masuk aplikasi: MyApp dan MaterialApp beserta tema
+├── main.dart                  # Titik masuk aplikasi: MyApp dan MaterialApp beserta tema
+├── models/
+│   └── education.dart         # Model data Education dan enum EducationLevel
 ├── screens/
-│   ├── menu.dart            # Halaman utama: MyHomePage, InfoCard, ItemHomepage
-│   └── project_form.dart    # Halaman form tambah proyek: ProjectFormPage
+│   ├── menu.dart              # Halaman utama: MyHomePage, InfoCard, ItemHomepage
+│   ├── project_form.dart      # Halaman form tambah proyek: ProjectFormPage
+│   └── education_form.dart    # Halaman form tambah edukasi: EducationFormPage
+├── utils/
+│   └── form_validators.dart   # Fungsi validasi form yang dapat dipakai ulang
 └── widgets/
-    ├── left_drawer.dart     # Drawer navigasi: LeftDrawer
-    └── project_card.dart    # Tombol aksi berbentuk kartu: ItemCard
+    ├── left_drawer.dart       # Drawer navigasi: LeftDrawer
+    └── project_card.dart      # Tombol aksi berbentuk kartu: ItemCard
 test/
 ├── widget_test.dart             # Test data profil, SnackBar, dan navigasi tombol
-├── responsive_layout_test.dart  # Test regresi overflow di berbagai ukuran layar
+├── responsive_layout_test.dart  # Test regresi overflow halaman utama dan form edukasi
 ├── snackbar_feedback_test.dart  # Test ikon, warna, dan gaya SnackBar per tombol
-└── project_form_test.dart       # Test validasi form, pop-up, dan navigasi drawer
+├── project_form_test.dart       # Test validasi form proyek, pop-up, dan navigasi drawer
+├── education_form_test.dart     # Test akses form edukasi, validasi, dialog, dan layar ponsel
+└── form_validators_test.dart    # Unit test setiap fungsi validasi
 ```
 
 ## Cara Menjalankan
@@ -58,6 +81,10 @@ test/
    ```bash
    flutter run
    ```
+   Untuk menjalankan di Chrome (dipakai untuk menguji opsi **Home** di drawer):
+   ```bash
+   flutter run -d chrome
+   ```
 4. Periksa kualitas kode dan jalankan test:
    ```bash
    flutter analyze
@@ -74,6 +101,7 @@ test/
 | 8 | Tugas 7 (kualitas kode) | Konstruktor `const` pada `MyHomePage` dan `ItemHomepage`, docstring pada seluruh class dan field, serta komentar yang menjelaskan keputusan layout |
 | 8 | Tugas 7 (fitur tambahan) | `SnackBar` mengambang dengan ikon dan warna latar sesuai tombol yang ditekan, beserta test-nya |
 | 9 | Tutorial 09 | Migrasi ke paket `material_ui`, drawer navigasi, halaman form tambah proyek dengan validasi dan pop-up, navigasi dari tombol **Tambah Proyek**, serta pemisahan berkas ke `screens/` dan `widgets/` |
+| 9 | Tugas 8 | Form tambah edukasi sesuai model `Education` (date picker, switch "Masih berlangsung", validasi panjang, URL, dan urutan tanggal), kartu **Tambah Edukasi** dengan `Navigator.push()`, opsi **Add Education** di drawer, grid tombol yang responsif, validator terpisah di `utils/`, serta 25 test baru |
 
 ## Pertanyaan Reflektif
 
@@ -119,7 +147,7 @@ test/
    - `Column` / `Row`: menyusun children secara vertikal atau horizontal.
    - `SizedBox`: memberi ruang kosong dengan ukuran tertentu.
    - `Center`: memposisikan child di tengah.
-   - `GridView` (lewat `GridView.count`): menyusun `ItemCard` dalam grid tiga kolom.
+   - `GridView`: menyusun `ItemCard` dalam bentuk grid. Pada Tugas 7 memakai `GridView.count` dengan tiga kolom; sejak Tugas 8 memakai `GridView.extent` agar jumlah kolom menyesuaikan lebar layar.
    - `Card`: kontainer bergaya Material dengan sudut membulat dan bayangan (elevation), dipakai pada `InfoCard`.
    - `Container`: kotak serbaguna, dipakai untuk memberi padding di dalam `ItemCard`.
    - `SingleChildScrollView`: membuat isi halaman dapat di-scroll agar tidak *overflow* pada layar pendek (misalnya mode landscape).
@@ -174,6 +202,40 @@ test/
    - Kode native (Android/Kotlin, iOS/Swift) atau konfigurasi platform.
    - Dependensi di `pubspec.yaml` yang memiliki kode native (plugin), atau penambahan aset baru.
 
+### Tugas 8
+
+1. **Perbedaan `Navigator.push()`, `Navigator.pushReplacement()`, dan `Navigator.pop()`**
+
+   `Navigator` menyimpan halaman (route) dalam bentuk tumpukan (*stack*).
+   - `push()` menaruh route baru **di atas** route yang sedang tampil. Route lama tetap ada di bawahnya, sehingga pengguna bisa kembali.
+   - `pushReplacement()` **mengganti** route paling atas dengan route baru. Route lama dibuang dari stack, jadi tombol Back tidak akan kembali ke sana.
+   - `pop()` **membuang** route paling atas sehingga route di bawahnya tampil kembali. Method ini juga dipakai untuk menutup dialog.
+
+   Formulir edukasi dibuka dari kartu **Tambah Edukasi** dengan `Navigator.push()`. Stack menjadi `[MyHomePage, EducationFormPage]`, sehingga tombol Back bawaan perangkat atau browser memanggil `pop()` dan membawa pengguna kembali ke halaman utama.
+
+   Opsi **Home** di drawer memakai `Navigator.pushReplacement()` dengan `MaterialPageRoute(builder: (context) => const MyHomePage())`. Route formulir yang sedang tampil (beserta drawer-nya) diganti dengan halaman utama yang baru, sehingga stack tidak terus bertambah setiap kali pengguna berpindah lewat drawer.
+
+2. **Konsistensi struktur dengan `Scaffold`, `AppBar`, dan `Drawer`**
+
+   Setiap halaman dibangun dengan kerangka yang sama: `Scaffold` menyediakan slot `appBar`, `drawer`, dan `body`. Akibatnya posisi judul di atas, tombol menu ☰ di kiri atas, dan konten di tengah selalu sama di halaman utama, form proyek, dan form edukasi. Drawer dibuat satu kali sebagai widget `LeftDrawer` di `lib/widgets/left_drawer.dart`, lalu dipasang dengan `drawer: const LeftDrawer()` di ketiga halaman. Menambah menu baru cukup dilakukan di satu tempat dan langsung muncul di semua halaman.
+
+   Contoh warna tema yang dipakai di lebih dari satu halaman: `main.dart` membuat tema dari `ColorScheme.fromSeed(seedColor: Colors.indigo)`. Warna `Theme.of(context).colorScheme.primary` dari tema itu dipakai sebagai warna `AppBar` halaman utama, warna `AppBar` form edukasi, dan warna tombol **Simpan** di form edukasi. Header drawer juga memakai warna indigo yang sama keluarganya.
+
+3. **Alasan tata letak formulir**
+
+   Formulir disusun sebagai satu kolom (`Column` dengan `CrossAxisAlignment.stretch`), satu field per baris dengan lebar penuh. Susunan ini paling mudah dibaca dari atas ke bawah di layar ponsel yang sempit, dan setiap field punya label, ikon, serta ruang pesan error sendiri. Urutannya mengikuti alur berpikir pengguna: identitas institusi, jenjang, logo, lalu periode waktu, dan tombol **Simpan** berada di paling bawah dengan lebar penuh agar mudah ditekan.
+
+   - **Widget pengatur jarak:** `SingleChildScrollView` memberi `padding` 16 px di sekeliling form, dan `SizedBox(height: 8/16/24)` memberi jarak antar-field. Jarak ini memisahkan field secara visual dan menyediakan ruang agar pesan error di bawah field tidak menempel ke field berikutnya.
+   - **Widget penggulir:** saat papan ketik muncul, `Scaffold` memperkecil area `body`. Tanpa penggulir, `Column` akan *overflow*. `SingleChildScrollView` membuat seluruh field dan tombol **Simpan** tetap bisa dijangkau dengan menggulir, dan `keyboardDismissBehavior: onDrag` menutup papan ketik saat pengguna menggulir. Dropdown jenjang memakai `isExpanded: true` agar teks pilihannya tidak melebar keluar layar sempit. Perilaku ini diuji di `test/education_form_test.dart` (layar 360×640 dengan papan ketik setinggi 300 px) dan `test/responsive_layout_test.dart`.
+
+4. **Peran `GlobalKey<FormState>`, `validator`, dan `validate()`**
+
+   - `GlobalKey<FormState>` (`_formKey`) dipasang di widget `Form` dan menjadi "pegangan" untuk mengakses state form dari luar widget field, misalnya dari fungsi `_submit()` milik tombol **Simpan**.
+   - `validator` adalah fungsi di setiap field yang mengembalikan pesan error (`String`) jika isian tidak valid, atau `null` jika valid. Di proyek ini, logikanya dipisahkan ke `lib/utils/form_validators.dart`.
+   - Saat **Simpan** ditekan, `_formKey.currentState!.validate()` menjalankan **semua** validator sekaligus, menampilkan pesan error di bawah field yang salah, lalu mengembalikan `true` hanya jika semuanya valid. Dialog ringkasan hanya dibuka ketika hasilnya `true`.
+
+   Contoh nilai yang ditolak: URL logo `ui.ac.id/logo.png`. Field ini memakai `keyboardType: TextInputType.url`, tetapi jenis keyboard hanya mengubah tata letak tombol di papan ketik ponsel, bukan membatasi isi yang boleh dimasukkan. Pengguna tetap bisa mengetik teks tanpa `https://`, menempelkan teks apa pun, atau memakai keyboard fisik di Chrome. Hal yang sama berlaku untuk nama institusi berisi spasi saja (`"    "`) yang lolos dari keyboard mana pun, dan untuk tanggal: date picker selesai memang membatasi tanggal paling awal sesuai tanggal mulai, tetapi pengguna masih bisa mengubah tanggal mulai setelahnya. Karena itu aturan model tetap harus diperiksa oleh `validator`.
+
 ## AI Disclosure
 
 ### Tugas 7
@@ -217,3 +279,39 @@ Setiap tahap mengikuti pola yang sama. Saya menetapkan tujuan dan batasan, AI me
 - **Draf jawaban reflektif tetap harus dipahami sendiri.** Jawaban dari AI saya tinjau dan cocokkan dengan kode saya, misalnya penggunaan `BuildContext` di `menu.dart`, supaya saya bisa menjelaskannya sendiri saat demo.
 - **Kerapian detail.** README sempat menyisakan *trailing whitespace* (terdeteksi oleh `git diff --check`) dan bagian analisis ini sempat terhapus saat tabel log diganti. Keduanya saya temukan saat review akhir dan saya perbaiki secara manual.
 - **Instruksi AI tidak selalu lengkap.** Pada tahap kualitas kode, AI memperkirakan `dart format` hanya mengubah file test, padahal file `lib` yang saya tempel juga ikut berubah (newline di akhir file). Akibatnya perubahan kecil itu masuk ke commit dokumentasi, bukan ke commit format. Pelajaran: selalu periksa `git status` sebelum dan sesudah commit.
+
+### Tugas 8
+
+**Tools yang digunakan**
+- **Claude Code** (model Claude Opus 5.5) di aplikasi desktop Claude.
+
+**Strategi prompting**
+- **Pahami rubrik sebelum menulis kode.** AI diminta membaca halaman soal dan rubrik Tugas 8, lalu memeriksa model `Education` dan `Experience` di proyek Django agar field form sesuai model asli.
+- **Keputusan desain tetap di tangan saya.** AI memaparkan pilihan bagian portofolio (Education, Experience, Certification) beserta kelebihan dan kekurangannya; saya memilih **Education** karena paling lengkap di proyek Django saya.
+- **AI sebagai pemandu, bukan pengeksekusi.** Seperti Tugas 7, AI menulis dan menguji solusi di salinan proyek terpisah, lalu memberikan langkah dan kode di chat. Saya yang menerapkan, menjalankan, membuat commit, dan membuat Pull Request.
+- **Verifikasi dengan test, bukan asumsi.** Setiap checklist (akses dari kartu dan drawer, input valid dan tidak valid, kembali ke Home, layar ponsel dengan keyboard) dibuktikan dengan widget test, lalu dicek ulang langsung di aplikasi yang berjalan di Chrome.
+
+**Bagian yang dibantu AI**
+- Pemetaan field form ke model `Education` di Django dan aturan validasinya.
+- Kode `EducationFormPage`, model `Education`, dan fungsi validasi di `utils/form_validators.dart`.
+- Penambahan kartu **Tambah Edukasi** dan opsi **Add Education** di drawer.
+- Widget test dan unit test baru.
+- Draf jawaban pertanyaan reflektif Tugas 8 yang kemudian saya baca, cocokkan dengan kode, dan pahami.
+
+**Log interaksi AI**
+
+| Tahap | Tujuan | Batasan / instruksi yang saya tetapkan | Keputusan dan tindakan saya | Validasi |
+|---|---|---|---|---|
+| 1. Analisis tugas | Memahami checklist dan rubrik Tugas 8 secara mendalam | AI hanya membaca soal dan proyek, tanpa mengubah file | Meninjau ringkasan kebutuhan dan hal yang rawan terlewat | Tabel checklist dan rubrik |
+| 2. Pemilihan bagian | Menentukan form baru yang sesuai model | Pilihan harus berdasarkan model Django yang sudah ada | Memilih Education setelah membandingkan dengan Experience dan Certification | Pemetaan field form ke field model |
+| 3. Implementasi form | Form edukasi dengan validasi sesuai aturan model | Validasi wajib menolak spasi saja, memeriksa panjang, URL, dan urutan tanggal | Mengimplementasikan form, model, dan validator di branch fitur | `flutter analyze` dan unit test validator |
+| 4. Navigasi | Akses form dari kartu dan drawer | Opsi Home dan Add Project tetap dipertahankan | Menambahkan kartu dan opsi drawer di branch fitur terpisah | Widget test akses dari kartu, drawer, dan kembali ke Home |
+| 5. Pengujian aplikasi | Memastikan alur berjalan di aplikasi sungguhan dan nyaman di ponsel | Tombol Simpan harus terjangkau saat keyboard tampil; AI diminta men-debug sendiri aplikasi yang saya jalankan | Menjalankan `flutter run -d chrome`; AI menguji kartu, tombol Back, drawer, Home, validasi, date picker, dan dialog langsung di aplikasi tersebut | Pengujian manual di Chrome tanpa error di console, ditambah test 320×480, 360×640, 800×360, dan simulasi keyboard |
+| 6. Dokumentasi | README Tugas 8 | Jawaban harus merujuk ke kode proyek ini | Meninjau draf jawaban dan AI disclosure | Preview Markdown dan `git diff --check` |
+
+**Analisis kritis keterbatasan AI dan perbaikan**
+- **Ada perbedaan antara model Django dan kebutuhan form.** `started_at` di Django diisi otomatis, sedangkan soal meminta `showDatePicker()` dan pemeriksaan urutan tanggal. AI menyoroti perbedaan ini, dan saya memutuskan tetap menambahkan input tanggal mulai serta mencatat alasannya di README. Pelajaran: "sesuai model" perlu ditafsirkan, bukan disalin mentah.
+- **Desain awal AI tidak teruji di layar lebar.** Grid dua kolom yang awalnya dipilih AI membuat tombol Logout keluar dari layar 800×600, dan baru ketahuan karena test gagal. Solusinya `GridView.extent` agar jumlah kolom menyesuaikan lebar layar.
+- **Overflow yang tidak terlihat di layar desktop.** Test pada ukuran ponsel menemukan dropdown jenjang melebar keluar layar; diperbaiki dengan `isExpanded: true`.
+- **Test buatan AI sempat salah, bukan kodenya.** Beberapa test awal gagal karena layar belum diperbarui setelah digulir dan karena field yang masih fokus menggulir layar kembali. Hint "Universitas Indonesia" juga sempat membuat test reset ambigu. Masalah ini diperbaiki di test dan juga mendorong perbaikan UX: tombol Simpan sekarang menutup papan ketik terlebih dahulu.
+- **Batas alat AI.** Saat menguji build web rilis, AI sempat gagal mengetik ke field Flutter yang digambar di canvas, dan klik pada mode emulasi ukuran ponsel di browser AI tidak akurat. Karena itu alur isi form pertama kali dibuktikan lewat widget test. Setelah saya menjalankan `flutter run -d chrome`, AI berhasil menguji alur lengkap di aplikasi tersebut, tetapi tampilan ukuran ponsel tetap bergantung pada test otomatis dan pengecekan saya sendiri di Chrome DevTools.
