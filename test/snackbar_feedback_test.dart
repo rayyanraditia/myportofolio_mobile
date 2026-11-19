@@ -6,6 +6,7 @@ void main() {
   const expectedButtons = <String, (IconData, Color)>{
     'Lihat Proyek': (Icons.folder, Colors.blue),
     'Tambah Proyek': (Icons.add_circle, Colors.green),
+    'Tambah Edukasi': (Icons.school, Colors.purple),
     'Logout': (Icons.logout, Colors.red),
   };
 
