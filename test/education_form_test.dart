@@ -1,9 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:myportofolio_mobile/main.dart';
 import 'package:myportofolio_mobile/screens/education_form.dart';
 import 'package:myportofolio_mobile/screens/menu.dart';
 import 'package:myportofolio_mobile/utils/form_validators.dart';
+
+import 'helpers/fake_backend.dart';
 
 /// Tanggal pada bulan berjalan, sesuai bulan yang dibuka date picker.
 String dayOfThisMonth(int day) {
@@ -58,7 +59,7 @@ void main() {
     testWidgets('Kartu Tambah Edukasi membuka form dan Back kembali', (
       tester,
     ) async {
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(buildTestApp(FakeBackend()));
 
       await tester.tap(find.text('Tambah Edukasi'));
       await tester.pumpAndSettle();
@@ -74,7 +75,7 @@ void main() {
     testWidgets('Drawer membuka form dan Home kembali ke halaman utama', (
       tester,
     ) async {
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(buildTestApp(FakeBackend()));
 
       await tester.tap(find.byTooltip('Open navigation menu'));
       await tester.pumpAndSettle();

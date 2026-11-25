@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myportofolio_mobile/main.dart';
+
+import 'helpers/fake_backend.dart';
 
 void main() {
   const expectedButtons = <String, (IconData, Color)>{
@@ -16,7 +17,7 @@ void main() {
     testWidgets('SnackBar tombol $name memakai ikon dan warna tombol', (
       tester,
     ) async {
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(buildTestApp(FakeBackend()));
 
       await tester.tap(find.text(name));
       await tester.pumpAndSettle();
@@ -28,7 +29,10 @@ void main() {
         find.descendant(of: find.byType(SnackBar), matching: find.byIcon(icon)),
         findsOneWidget,
       );
-      expect(find.text('Kamu telah menekan tombol $name!'), findsOneWidget);
+      expect(
+        find.textContaining('Kamu telah menekan tombol $name!'),
+        findsOneWidget,
+      );
     });
   });
 }

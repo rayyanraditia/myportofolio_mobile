@@ -11,6 +11,9 @@ const int maxTitleLength = 255;
 /// Batas panjang bawaan `URLField` pada model Django.
 const int maxUrlLength = 200;
 
+/// Batas panjang `project_image_url` (`URLField(max_length=500)`) di Django.
+const int maxImageUrlLength = 500;
+
 /// Menolak input kosong atau yang hanya berisi spasi.
 String? validateRequired(String? value, String fieldName) {
   if (value == null || value.trim().isEmpty) {
@@ -35,12 +38,12 @@ String? validateRequiredWithMaxLength(
 }
 
 /// Memvalidasi URL opsional: boleh kosong, tetapi jika diisi harus berupa
-/// URL `http` atau `https` yang lengkap dan tidak melebihi [maxUrlLength].
-String? validateOptionalUrl(String? value) {
+/// URL `http` atau `https` yang lengkap dan tidak melebihi [maxLength].
+String? validateOptionalUrl(String? value, {int maxLength = maxUrlLength}) {
   final url = value?.trim() ?? '';
   if (url.isEmpty) return null;
-  if (url.length > maxUrlLength) {
-    return 'URL maksimal $maxUrlLength karakter!';
+  if (url.length > maxLength) {
+    return 'URL maksimal $maxLength karakter!';
   }
   final uri = Uri.tryParse(url);
   final hasValidScheme =
@@ -49,6 +52,13 @@ String? validateOptionalUrl(String? value) {
     return 'Masukkan URL valid yang diawali http:// atau https://';
   }
   return null;
+}
+
+/// Memvalidasi URL wajib: tidak boleh kosong dan harus berformat URL valid.
+String? validateRequiredUrl(String? value, String fieldName) {
+  final requiredError = validateRequired(value, fieldName);
+  if (requiredError != null) return requiredError;
+  return validateOptionalUrl(value);
 }
 
 /// Memastikan tanggal mulai sudah dipilih.
