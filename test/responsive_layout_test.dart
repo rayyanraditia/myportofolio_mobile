@@ -1,7 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:myportofolio_mobile/main.dart';
 import 'package:myportofolio_mobile/screens/education_form.dart';
+
+import 'helpers/fake_backend.dart';
 
 void main() {
   const screenSizes = <String, Size>{
@@ -16,7 +17,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
 
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(buildTestApp(FakeBackend()));
 
       expect(tester.takeException(), isNull);
     });

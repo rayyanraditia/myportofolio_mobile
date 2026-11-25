@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:myportofolio_mobile/screens/education_form.dart';
 import 'package:myportofolio_mobile/screens/project_form.dart';
+import 'package:myportofolio_mobile/screens/project_list_screen.dart';
 import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 import 'package:myportofolio_mobile/widgets/project_card.dart';
 
@@ -24,17 +25,23 @@ class MyHomePage extends StatelessWidget {
 
   /// Daftar tombol aksi yang ditampilkan di halaman utama.
   ///
-  /// Setiap tombol membawa warna dan halaman tujuannya sendiri melalui
-  /// [ItemHomepage.color] dan [ItemHomepage.page], sehingga [ItemCard] tidak
-  /// memerlukan percabangan berdasarkan nama tombol. Daftar dibuat `const`
-  /// agar hanya dialokasikan sekali saat kompilasi.
+  /// Setiap tombol membawa warna, halaman tujuan, dan aturan aksesnya
+  /// sendiri melalui [ItemHomepage], sehingga [ItemCard] tidak memerlukan
+  /// percabangan berdasarkan nama tombol. Daftar dibuat `const` agar hanya
+  /// dialokasikan sekali saat kompilasi.
   final List<ItemHomepage> items = const [
-    ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
+    ItemHomepage(
+      "Lihat Proyek",
+      Icons.folder,
+      Colors.blue,
+      page: ProjectListScreen(),
+    ),
     ItemHomepage(
       "Tambah Proyek",
       Icons.add_circle,
       Colors.green,
       page: ProjectFormPage(),
+      requiresLogin: true,
     ),
     ItemHomepage(
       "Tambah Edukasi",
@@ -42,7 +49,7 @@ class MyHomePage extends StatelessWidget {
       Colors.purple,
       page: EducationFormPage(),
     ),
-    ItemHomepage("Logout", Icons.logout, Colors.red),
+    ItemHomepage("Logout", Icons.logout, Colors.red, isLogout: true),
   ];
 
   @override
@@ -175,5 +182,18 @@ class ItemHomepage {
   /// menampilkan SnackBar.
   final Widget? page;
 
-  const ItemHomepage(this.name, this.icon, this.color, {this.page});
+  /// Jika `true`, [page] hanya dibuka setelah pengguna login.
+  final bool requiresLogin;
+
+  /// Jika `true`, tombol ini menjalankan logout.
+  final bool isLogout;
+
+  const ItemHomepage(
+    this.name,
+    this.icon,
+    this.color, {
+    this.page,
+    this.requiresLogin = false,
+    this.isLogout = false,
+  });
 }
